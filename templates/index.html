@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Love Quest - A Surprise for My Girlfriend</title>
+    <!-- Load Tailwind CSS for instant styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .app-container { max-width: 550px; min-height: 100vh; margin: 0 auto; }
+        
+        /* CSS for the smooth flip transition */
+        .flip-container {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flipper {
+            transition: 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+        .flip-container.flipped .flipper {
+            transform: rotateY(180deg);
+        }
+        .front, .back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .front {
+            z-index: 2;
+            transform: rotateY(0deg);
+        }
+        .back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-pink-50 p-4 flex items-center justify-center">
+
+    <!-- Main Content Area - This is where JavaScript will render the game -->
+    <div id="app-root" class="app-container w-full">
+        <!-- Content injected by JavaScript -->
+    </div>
+
+    <!-- JavaScript Game Logic and Data -->
+    <script>
+        // --- APPLICATION DATA (!!! CUSTOMIZE THIS SECTION !!!) ---
+
+        // Level 1: The Personalized Quiz Data
+        const QUIZ_QUESTIONS = [
+            { id: 1, question: "Where did we first meet?", options: ["Coffee Shop", "Concert Venue", "Work/School", "Through a Friend"], correctAnswer: "Through a Friend" }, // <--- CUSTOMIZE
+            { id: 2, question: "What is my favorite meal to cook for you?", options: ["Pizza Night", "Tacos", "Pasta Dish", "Steak"], correctAnswer: "Pasta Dish" }, // <--- CUSTOMIZE
+            { id: 3, question: "Which country/city do I always talk about visiting next?", options: ["Japan", "Italy", "Greece", "Iceland"], correctAnswer: "Italy" }, // <--- CUSTOMIZE
+            { id: 4, question: "What was the very first gift I ever gave you?", options: ["Flowers", "A Book", "A Handwritten Letter", "A Silly Mug"], correctAnswer: "A Handwritten Letter" }, // <--- CUSTOMIZE
+            { id: 5, question: "If I could listen to one song forever, what would it be?", options: ["Upbeat Pop Song", "Classic Rock Ballad", "Instrumental Jazz", "A Romantic Duet"], correctAnswer: "A Romantic Duet" }, // <--- CUSTOMIZE
+        ];
+
+        // Level 2: The Matching Game Data (15 Pairs = 30 Tiles)
+        // TIP: To use PICTURES instead of emojis, replace the emoji string with an image URL.
+        const MEMORY_PAIRS = [
+            { id: 1, content: 'First Kiss', icon: '💋' },
+            { id: 2, content: 'Vacation Trip', icon: '✈️' },
+            { id: 3, content: 'Our Song', icon: '🎶' },
+            { id: 4, content: 'Pet Name', icon: '🐻' },
+            { id: 5, content: 'Inside Joke', icon: '😂' },
+            { id: 6, content: 'Favorite Restaurant', icon: '🍔' },
+            { id: 7, content: 'Late Night Talk', icon: '🌙' },
+            { id: 8, content: 'Future Dream', icon: '🏡' },
+            { id: 9, content: 'First Selfie', icon: '📸' },
+            { id: 10, content: 'Surprise Date', icon: '🎁' },
+            { id: 11, content: 'Cozy Movie Night', icon: '🍿' },
+            { id: 12, content: 'The Great Argument', icon: '💥' },
+            { id: 13, content: 'My Parents Meet', icon: '👨‍👩‍👧‍👦' },
+            { id: 14, content: 'The Rainy Walk', icon: '☔' },
+            { id: 15, content: 'Proposal Spot', icon: '💍' },
+        ];
+
+        // Final Gift Content (!!! CUSTOMIZE THIS !!!)
+        const FINAL_GIFT = {
+            title: "The Final Memory Unlocked: Our Next Adventure!",
+            message: "Congratulations, my love! You aced the quiz and unlocked all our cherished memories. As the final prize, I've planned the most amazing date/trip/gift for us this weekend. Check your email for the full details! I love you more than all these moments combined.",
+            photoUrl: "https://placehold.co/400x300/F0F9FF/06B6D4?text=Our+Favorite+Picture+Here", // <--- REPLACE WITH YOUR IMAGE URL
+        };
+
+        // --- GLOBAL STATE AND HELPER FUNCTIONS ---
+        let currentView = 'start';
+        const appRoot = document.getElementById('app-root');
+
+        const shuffleArray = (array) => {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        };
+
+        // --- VIEW RENDERING FUNCTIONS ---
+
+        function renderStartScreen() {
+            appRoot.innerHTML = `
+                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
+                    <div class="text-6xl mb-4 animate-bounce">💖</div>
+                    <h1 class="text-4xl font-extrabold text-gray-800 mb-2">Our Love Quest</h1>
+                    <h2 class="text-xl text-pink-600 mb-6">A Personalized Adventure for My Love</h2>
+                    <p class="text-lg text-gray-600 mb-8">
+                        To unlock your surprise, you must prove you know our story!
+                    </p>
+                    <button id="start-btn"
+                        class="w-full py-3 px-6 bg-pink-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-pink-600 transition duration-300 transform hover:scale-105">
+                        Start the Adventure
+                    </button>
+                </div>
+            `;
+            document.getElementById('start-btn').onclick = () => {
+                currentView = 'quiz';
+                renderQuiz();
+            };
+        }
+
+        let currentQuestionIndex = 0;
+        let answers = {};
+
+        function renderQuiz() {
+            const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
+            if (!currentQuestion) {
+                renderQuizResult();
+                return;
+            }
+
+            appRoot.innerHTML = `
+                <div class="p-6 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
+                    <div class="text-sm text-pink-500 mb-4 font-semibold">
+                        Question ${currentQuestionIndex + 1} of ${QUIZ_QUESTIONS.length}
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                        ${currentQuestion.question}
+                    </h2>
+                    <div id="options-container" class="space-y-4">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+            `;
+            const optionsContainer = document.getElementById('options-container');
+
+            currentQuestion.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.textContent = option;
+                btn.className = "w-full text-left py-3 px-4 bg-pink-100 text-gray-700 rounded-lg border border-pink-300 hover:bg-pink-200 transition duration-150 font-medium";
+                btn.onclick = () => handleAnswer(option, currentQuestion.id);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selectedOption, questionId) {
+            answers[questionId] = selectedOption;
+            currentQuestionIndex++;
+            renderQuiz();
+        }
+
+        function renderQuizResult() {
+            const requiredScore = QUIZ_QUESTIONS.length;
+            const score = QUIZ_QUESTIONS.filter(q => answers[q.id] === q.correctAnswer).length;
+            const isSuccess = score >= requiredScore;
+
+            appRoot.innerHTML = `
+                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 ${isSuccess ? 'border-pink-500' : 'border-red-500'}">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
+                    <p class="text-5xl font-extrabold ${isSuccess ? 'text-pink-600' : 'text-red-500'} mb-6">
+                        Score: ${score}/${requiredScore}
+                    </p>
+
+                    ${isSuccess ? `
+                        <div class="text-6xl mb-4 text-yellow-500 animate-pulse">✨</div>
+                        <p class="text-xl font-medium text-gray-700 mb-6">
+                            You know me perfectly! Our memories are safe with you.
+                        </p>
+                        <button id="next-level-btn"
+                            class="w-full py-3 px-6 bg-pink-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-pink-600 transition duration-300 transform hover:scale-105">
+                            Continue to Level 2: Unlock Our Memories
+                        </button>
+                    ` : `
+                        <div class="text-6xl mb-4 text-red-500">❌</div>
+                        <p class="text-xl font-medium text-gray-700 mb-6">
+                            Aww, you missed a few! Let's make sure our history is crystal clear.
+                        </p>
+                        <button id="retry-btn"
+                            class="w-full py-3 px-6 bg-gray-400 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-gray-500 transition duration-300">
+                            Try Again
+                        </button>
+                    `}
+                </div>
+            `;
+
+            if (isSuccess) {
+                document.getElementById('next-level-btn').onclick = () => {
+                    currentView = 'game';
+                    initializeGame();
+                    renderMatchingGame();
+                };
+            } else {
+                document.getElementById('retry-btn').onclick = () => {
+                    currentQuestionIndex = 0;
+                    answers = {};
+                    renderQuiz();
+                };
+            }
+        }
+
+        // --- MATCHING GAME LOGIC ---
+
+        let gameTiles = [];
+        let flippedTiles = [];
+        let matchedPairs = 0;
+        let lockBoard = false;
+        const totalPairs = MEMORY_PAIRS.length;
+
+        function initializeGame() {
+            const doubledTiles = MEMORY_PAIRS.flatMap(p => [
+                { id: p.id, icon: p.icon, isFlipped: false, isMatched: false, key: `${p.id}-a` },
+                { id: p.id, icon: p.icon, isFlipped: false, isMatched: false, key: `${p.id}-b` },
+            ]);
+            gameTiles = shuffleArray(doubledTiles);
+            flippedTiles = [];
+            matchedPairs = 0;
+            lockBoard = false;
+        }
+
+        function renderMatchingGame() {
+            appRoot.innerHTML = `
+                <div class="text-center p-4 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Level 2: Find Our ${totalPairs} Memories!</h2>
+                    <p class="text-sm text-gray-500 mb-4">
+                        Matched Pairs: <span id="matched-count">${matchedPairs}</span> / ${totalPairs}
+                    </p>
+                    <div id="game-board" class="grid grid-cols-5 gap-2 md:grid-cols-6 md:gap-3 p-2 bg-pink-50 rounded-lg">
+                        <!-- Tiles injected here -->
+                    </div>
+                </div>
+            `;
+
+            const gameBoard = document.getElementById('game-board');
+            gameBoard.style.gridTemplateColumns = 'repeat(5, minmax(0, 1fr))'; 
+            
+            gameTiles.forEach((tile, index) => {
+                const tileDiv = document.createElement('div');
+                tileDiv.className = `flip-container aspect-square transition duration-300 ${tile.isFlipped ? 'flipped' : ''} ${tile.isMatched ? 'invisible' : ''}`;
+                tileDiv.setAttribute('data-index', index);
+                
+                tileDiv.innerHTML = `
+                    <div class="flipper w-full h-full">
+                        <div class="front bg-pink-300 text-pink-800 shadow-md">
+                            <span class="text-4xl">🔒</span>
+                        </div>
+                        <div class="back bg-pink-500 text-white shadow-xl text-3xl">
+                            ${tile.icon.startsWith('http') ? `<img src="${tile.icon}" class="object-cover w-full h-full rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/40x40/F0F9FF/06B6D4?text=X';" />` : tile.icon}
+                        </div>
+                    </div>
+                `;
+                tileDiv.onclick = () => handleTileClick(index);
+                gameBoard.appendChild(tileDiv);
+            });
+        }
+
+        function handleTileClick(index) {
+            if (lockBoard || gameTiles[index].isFlipped || gameTiles[index].isMatched) return;
+
+            gameTiles[index].isFlipped = true;
+            flippedTiles.push(index);
+
+            renderMatchingGame();
+
+            if (flippedTiles.length === 2) {
+                lockBoard = true;
+                const [index1, index2] = flippedTiles;
+                const tile1 = gameTiles[index1];
+                const tile2 = gameTiles[index2];
+
+                if (tile1.id === tile2.id) {
+                    // Match found!
+                    setTimeout(() => {
+                        gameTiles[index1].isMatched = true;
+                        gameTiles[index2].isMatched = true;
+                        matchedPairs++;
+                        
+                        flippedTiles = [];
+                        lockBoard = false;
+                        renderMatchingGame(); 
+
+                        if (matchedPairs === totalPairs) {
+                            setTimeout(() => {
+                                currentView = 'final';
+                                renderFinalScreen();
+                            }, 1000); 
+                        }
+                    }, 800);
+                } else {
+                    // No match - flip back
+                    setTimeout(() => {
+                        gameTiles[index1].isFlipped = false;
+                        gameTiles[index2].isFlipped = false;
+                        flippedTiles = [];
+                        lockBoard = false;
+                        renderMatchingGame();
+                    }, 1500);
+                }
+            }
+        }
+
+        function renderFinalScreen() {
+            appRoot.innerHTML = `
+                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 border-yellow-500">
+                    <div class="text-6xl mb-4 text-yellow-500 animate-bounce">🎁</div>
+                    <h1 class="text-4xl font-extrabold text-gray-800 mb-4">${FINAL_GIFT.title}</h1>
+                    <img 
+                        src="${FINAL_GIFT.photoUrl}" 
+                        alt="Final Gift Surprise" 
+                        class="w-full h-auto max-h-96 rounded-lg shadow-xl mb-6 mx-auto object-cover" 
+                        onerror="this.onerror=null;this.src='https://placehold.co/400x300/F0F9FF/06B6D4?text=IMAGE+ERROR';"
+                    />
+                    <p class="text-lg text-gray-700 whitespace-pre-wrap leading-relaxed mb-6">
+                        ${FINAL_GIFT.message}
+                    </p>
+                    <div class="flex justify-center space-x-4 mt-6">
+                        <div class="text-3xl text-yellow-500">✨</div>
+                        <p class="text-lg font-bold text-pink-600">I love you!</p>
+                        <div class="text-3xl text-red-500">❤️</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', renderStartScreen);
+    </script>
+</body>
+</html>
