@@ -43,6 +43,11 @@
         .back {
             transform: rotateY(180deg);
         }
+        /* *** FIX 2: IMPROVED IMAGE RENDERING *** */
+        .back img {
+            image-rendering: -webkit-optimize-contrast; /* For webkit browsers */
+            image-rendering: crisp-edges; /* Standard for sharper scaling */
+        }
     </style>
 </head>
 <body class="bg-pink-50 p-4 flex items-center justify-center">
@@ -54,43 +59,41 @@
 
     <!-- JavaScript Game Logic and Data -->
     <script>
-        // --- APPLICATION DATA (CUSTOMIZE TEXT ONLY) ---
+        // --- APPLICATION DATA (CUSTOMIZED) ---
 
         // Level 1: The Personalized Quiz Data
         const QUIZ_QUESTIONS = [
-            { id: 1, question: "Where did we first kiss?", options: ["area 51", "rushikonda beach", "rk beach", "teneti park"], correctAnswer: "rushikonda beach" }, 
-            { id: 2, question: "What flower photos did I send you when we started texting?", options: ["lotus", "rose", "lilly", "lavender"], correctAnswer: "lilly" }, 
-            { id: 3, question: "What was the first movie we watched together?", options: ["dragon", "mickey17", "dhadak 2", "mad square"], correctAnswer: "mickey17" }, 
-            { id: 4, question: "In which month we ate our first Rushikonda morning maggie?", options: ["may", "april", "june", "march"], correctAnswer: "may" }, 
-            { id: 5, question: "Which company's exam was I writing when I stayed for a week in Kakinada?", options: ["infosys", "capgemini", "ibm", "wipro"], correctAnswer: "wipro" }, 
+            { id: 1, question: "Where did we first kiss?", options: ["Area 51 cafe", "Rushikonda beach", "RK beach", "Teneti Park"], correctAnswer: "Rushikonda beach" }, 
+            { id: 2, question: "What flower photos did I send you when we started texting?", options: ["Lotus", "Rose", "Lily", "Lavender"], correctAnswer: "Lily" }, 
+            { id: 3, question: "What was the first movie we watched together?", options: ["Dragon", "Mickey17", "Dhadak 2", "Mad Square"], correctAnswer: "Mickey17" }, 
+            { id: 4, question: "In which month we ate our first Rushikonda morning maggie?", options: ["May", "April", "June", "March"], correctAnswer: "May" }, 
+            { id: 5, question: "Which company's exam was I writing when I stayed for a week in Kakinada?", options: ["Infosys", "Capgemini", "IBM", "Wipro"], correctAnswer: "Wipro" }, 
         ];
 
         // Level 2: The Matching Game Data (15 Pairs = 30 Tiles)
-        // IMAGE PATHS ARE NOW CORRECTLY INSERTED USING FLASK TEMPLATING
         const MEMORY_PAIRS = [
-            // *** You must replace the content text below ***
             { id: 1, content: 'Rushikonda First Kiss', icon: "{{ url_for('static', filename='photo1.png') }}" },
-            { id: 2, content: 'Lilly Photos', icon: "{{ url_for('static', filename='photo2.png') }}" },
-            { id: 3, content: 'Mickey17 Night', icon: "{{ url_for('static', filename='photo3.jpg') }}" },
-            { id: 4, content: 'May Maggie Morning', icon: "{{ url_for('static', filename='photo4.jpg') }}" },
-            { id: 5, content: 'Wipro Kakinada Week', icon: "{{ url_for('static', filename='photo5.jpg') }}" },
-            { id: 6, content: 'Memory Six', icon: "{{ url_for('static', filename='photo6.jpg') }}" },
-            { id: 7, content: 'Memory Seven', icon: "{{ url_for('static', filename='photo7.jpg') }}" },
-            { id: 8, content: 'Memory Eight', icon: "{{ url_for('static', filename='photo8.jpg') }}" },
-            { id: 9, content: 'Memory Nine', icon: "{{ url_for('static', filename='photo9.jpg') }}" },
-            { id: 10, content: 'Memory Ten', icon: "{{ url_for('static', filename='photo10.jpg') }}" },
-            { id: 11, content: 'Memory Eleven', icon: "{{ url_for('static', filename='photo11.jpg') }}" },
-            { id: 12, content: 'Memory Twelve', icon: "{{ url_for('static', filename='photo12.jpg') }}" },
-            { id: 13, content: 'Memory Thirteen', icon: "{{ url_for('static', filename='photo13.jpg') }}" },
-            { id: 14, content: 'Memory Fourteen', icon: "{{ url_for('static', filename='photo14.jpg') }}" },
-            { id: 15, content: 'Proposal Spot', icon: "{{ url_for('static', filename='photo15.jpg') }}" },
+            { id: 2, content: 'Lily Photos', icon: "{{ url_for('static', filename='photo2.png') }}" },
+            { id: 3, content: 'Mickey17 Night', icon: "{{ url_for('static', filename='photo3.png') }}" },
+            { id: 4, content: 'May Maggie Morning', icon: "{{ url_for('static', filename='photo4.png') }}" },
+            { id: 5, content: 'Wipro Kakinada Week', icon: "{{ url_for('static', filename='photo5.png') }}" },
+            { id: 6, content: 'Memory Six', icon: "{{ url_for('static', filename='photo6.png') }}" },
+            { id: 7, content: 'Memory Seven', icon: "{{ url_for('static', filename='photo7.png') }}" },
+            { id: 8, content: 'Memory Eight', icon: "{{ url_for('static', filename='photo8.png') }}" },
+            { id: 9, content: 'Memory Nine', icon: "{{ url_for('static', filename='photo9.png') }}" },
+            { id: 10, content: 'Memory Ten', icon: "{{ url_for('static', filename='photo10.png') }}" },
+            { id: 11, content: 'Memory Eleven', icon: "{{ url_for('static', filename='photo11.png') }}" },
+            { id: 12, content: 'Memory Twelve', icon: "{{ url_for('static', filename='photo12.png') }}" },
+            { id: 13, content: 'Memory Thirteen', icon: "{{ url_for('static', filename='photo13.png') }}" },
+            { id: 14, content: 'Memory Fourteen', icon: "{{ url_for('static', filename='photo14.png') }}" },
+            { id: 15, content: 'Proposal Spot', icon: "{{ url_for('static', filename='photo15.png') }}" },
         ];
 
         // Final Gift Content (CUSTOMIZED)
         const FINAL_GIFT = {
             title: "Congratulations, my cutu! You aced the quiz and unlocked all our cherished memories.", 
             
-            message: "I'm now coming to your wonderful college event. I love you more than all these moments combined.\n\nI love youuuuu 💩",
+            message: "I'm now coming to your wonderful college event. And you can kiss me now. I love you more than all these moments combined.\n\nI love youuuuu 💩",
             
             photoUrl: "{{ url_for('static', filename='final_photo.jpg') }}", 
         };
@@ -335,7 +338,7 @@
                     </p>
                     <div class="flex justify-center space-x-4 mt-6">
                         <div class="text-3xl text-yellow-500">✨</div>
-                        <p class="text-lg font-bold text-pink-600">I love you!</p>
+                        <p class="text-lg text-black-600">Chala ante Chala</p>
                         <div class="text-3xl text-red-500">❤️</div>
                     </div>
                 </div>
