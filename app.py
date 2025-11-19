@@ -7,14 +7,13 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     """
-    This function renders the index.html file found inside the 'templates' folder.
-    All the game logic (HTML, CSS, JavaScript) is handled by the frontend file.
+    Renders index.html. Flask's render_template makes the 'url_for' function 
+    available inside the index.html template for referencing static files.
     """
     return render_template('index.html')
 
 if __name__ == '__main__':
-    # Start the server on port 5000. 
-    # The debug=True flag allows the server to restart automatically when you save changes.
+    # Run the server
     print("----------------------------------------------------------")
     print("🚀 FLASK SERVER READY!")
     print("Open your browser and navigate to: http://127.0.0.1:5000/")

@@ -54,42 +54,45 @@
 
     <!-- JavaScript Game Logic and Data -->
     <script>
-        // --- APPLICATION DATA (!!! CUSTOMIZE THIS SECTION !!!) ---
+        // --- APPLICATION DATA (CUSTOMIZE TEXT ONLY) ---
 
         // Level 1: The Personalized Quiz Data
         const QUIZ_QUESTIONS = [
-            { id: 1, question: "Where did we first meet?", options: ["Coffee Shop", "Concert Venue", "Work/School", "Through a Friend"], correctAnswer: "Through a Friend" }, // <--- CUSTOMIZE
-            { id: 2, question: "What is my favorite meal to cook for you?", options: ["Pizza Night", "Tacos", "Pasta Dish", "Steak"], correctAnswer: "Pasta Dish" }, // <--- CUSTOMIZE
-            { id: 3, question: "Which country/city do I always talk about visiting next?", options: ["Japan", "Italy", "Greece", "Iceland"], correctAnswer: "Italy" }, // <--- CUSTOMIZE
-            { id: 4, question: "What was the very first gift I ever gave you?", options: ["Flowers", "A Book", "A Handwritten Letter", "A Silly Mug"], correctAnswer: "A Handwritten Letter" }, // <--- CUSTOMIZE
-            { id: 5, question: "If I could listen to one song forever, what would it be?", options: ["Upbeat Pop Song", "Classic Rock Ballad", "Instrumental Jazz", "A Romantic Duet"], correctAnswer: "A Romantic Duet" }, // <--- CUSTOMIZE
+            { id: 1, question: "Where did we first kiss?", options: ["area 51", "rushikonda beach", "rk beach", "teneti park"], correctAnswer: "rushikonda beach" }, 
+            { id: 2, question: "What flower photos did I send you when we started texting?", options: ["lotus", "rose", "lilly", "lavender"], correctAnswer: "lilly" }, 
+            { id: 3, question: "What was the first movie we watched together?", options: ["dragon", "mickey17", "dhadak 2", "mad square"], correctAnswer: "mickey17" }, 
+            { id: 4, question: "In which month we ate our first Rushikonda morning maggie?", options: ["may", "april", "june", "march"], correctAnswer: "may" }, 
+            { id: 5, question: "Which company's exam was I writing when I stayed for a week in Kakinada?", options: ["infosys", "capgemini", "ibm", "wipro"], correctAnswer: "wipro" }, 
         ];
 
         // Level 2: The Matching Game Data (15 Pairs = 30 Tiles)
-        // TIP: To use PICTURES instead of emojis, replace the emoji string with an image URL.
+        // IMAGE PATHS ARE NOW CORRECTLY INSERTED USING FLASK TEMPLATING
         const MEMORY_PAIRS = [
-            { id: 1, content: 'First Kiss', icon: '💋' },
-            { id: 2, content: 'Vacation Trip', icon: '✈️' },
-            { id: 3, content: 'Our Song', icon: '🎶' },
-            { id: 4, content: 'Pet Name', icon: '🐻' },
-            { id: 5, content: 'Inside Joke', icon: '😂' },
-            { id: 6, content: 'Favorite Restaurant', icon: '🍔' },
-            { id: 7, content: 'Late Night Talk', icon: '🌙' },
-            { id: 8, content: 'Future Dream', icon: '🏡' },
-            { id: 9, content: 'First Selfie', icon: '📸' },
-            { id: 10, content: 'Surprise Date', icon: '🎁' },
-            { id: 11, content: 'Cozy Movie Night', icon: '🍿' },
-            { id: 12, content: 'The Great Argument', icon: '💥' },
-            { id: 13, content: 'My Parents Meet', icon: '👨‍👩‍👧‍👦' },
-            { id: 14, content: 'The Rainy Walk', icon: '☔' },
-            { id: 15, content: 'Proposal Spot', icon: '💍' },
+            // *** You must replace the content text below ***
+            { id: 1, content: 'Rushikonda First Kiss', icon: "{{ url_for('static', filename='photo1.png') }}" },
+            { id: 2, content: 'Lilly Photos', icon: "{{ url_for('static', filename='photo2.png') }}" },
+            { id: 3, content: 'Mickey17 Night', icon: "{{ url_for('static', filename='photo3.jpg') }}" },
+            { id: 4, content: 'May Maggie Morning', icon: "{{ url_for('static', filename='photo4.jpg') }}" },
+            { id: 5, content: 'Wipro Kakinada Week', icon: "{{ url_for('static', filename='photo5.jpg') }}" },
+            { id: 6, content: 'Memory Six', icon: "{{ url_for('static', filename='photo6.jpg') }}" },
+            { id: 7, content: 'Memory Seven', icon: "{{ url_for('static', filename='photo7.jpg') }}" },
+            { id: 8, content: 'Memory Eight', icon: "{{ url_for('static', filename='photo8.jpg') }}" },
+            { id: 9, content: 'Memory Nine', icon: "{{ url_for('static', filename='photo9.jpg') }}" },
+            { id: 10, content: 'Memory Ten', icon: "{{ url_for('static', filename='photo10.jpg') }}" },
+            { id: 11, content: 'Memory Eleven', icon: "{{ url_for('static', filename='photo11.jpg') }}" },
+            { id: 12, content: 'Memory Twelve', icon: "{{ url_for('static', filename='photo12.jpg') }}" },
+            { id: 13, content: 'Memory Thirteen', icon: "{{ url_for('static', filename='photo13.jpg') }}" },
+            { id: 14, content: 'Memory Fourteen', icon: "{{ url_for('static', filename='photo14.jpg') }}" },
+            { id: 15, content: 'Proposal Spot', icon: "{{ url_for('static', filename='photo15.jpg') }}" },
         ];
 
-        // Final Gift Content (!!! CUSTOMIZE THIS !!!)
+        // Final Gift Content (CUSTOMIZED)
         const FINAL_GIFT = {
-            title: "The Final Memory Unlocked: Our Next Adventure!",
-            message: "Congratulations, my love! You aced the quiz and unlocked all our cherished memories. As the final prize, I've planned the most amazing date/trip/gift for us this weekend. Check your email for the full details! I love you more than all these moments combined.",
-            photoUrl: "https://placehold.co/400x300/F0F9FF/06B6D4?text=Our+Favorite+Picture+Here", // <--- REPLACE WITH YOUR IMAGE URL
+            title: "Congratulations, my cutu! You aced the quiz and unlocked all our cherished memories.", 
+            
+            message: "I'm now coming to your wonderful college event. I love you more than all these moments combined.\n\nI love youuuuu 💩",
+            
+            photoUrl: "{{ url_for('static', filename='final_photo.jpg') }}", 
         };
 
         // --- GLOBAL STATE AND HELPER FUNCTIONS ---
@@ -104,7 +107,7 @@
             return array;
         };
 
-        // --- VIEW RENDERING FUNCTIONS ---
+        // --- VIEW RENDERING FUNCTIONS (UNCHANGED) ---
 
         function renderStartScreen() {
             appRoot.innerHTML = `
@@ -226,8 +229,8 @@
 
         function initializeGame() {
             const doubledTiles = MEMORY_PAIRS.flatMap(p => [
-                { id: p.id, icon: p.icon, isFlipped: false, isMatched: false, key: `${p.id}-a` },
-                { id: p.id, icon: p.icon, isFlipped: false, isMatched: false, key: `${p.id}-b` },
+                { id: p.id, icon: p.icon, content: p.content, isFlipped: false, isMatched: false, key: `${p.id}-a` },
+                { id: p.id, icon: p.icon, content: p.content, isFlipped: false, isMatched: false, key: `${p.id}-b` },
             ]);
             gameTiles = shuffleArray(doubledTiles);
             flippedTiles = [];
@@ -261,8 +264,8 @@
                         <div class="front bg-pink-300 text-pink-800 shadow-md">
                             <span class="text-4xl">🔒</span>
                         </div>
-                        <div class="back bg-pink-500 text-white shadow-xl text-3xl">
-                            ${tile.icon.startsWith('http') ? `<img src="${tile.icon}" class="object-cover w-full h-full rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/40x40/F0F9FF/06B6D4?text=X';" />` : tile.icon}
+                        <div class="back bg-pink-500 text-white shadow-xl text-3xl p-1">
+                            <img src="${tile.icon}" alt="${tile.content}" class="object-cover w-full h-full rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/40x40/F0F9FF/06B6D4?text=X';" />
                         </div>
                     </div>
                 `;
@@ -286,7 +289,7 @@
                 const tile2 = gameTiles[index2];
 
                 if (tile1.id === tile2.id) {
-                    // Match found!
+                    // Match found! (600ms success delay)
                     setTimeout(() => {
                         gameTiles[index1].isMatched = true;
                         gameTiles[index2].isMatched = true;
@@ -302,16 +305,16 @@
                                 renderFinalScreen();
                             }, 1000); 
                         }
-                    }, 800);
+                    }, 600); 
                 } else {
-                    // No match - flip back
+                    // No match - flip back. (800ms mismatch delay)
                     setTimeout(() => {
                         gameTiles[index1].isFlipped = false;
                         gameTiles[index2].isFlipped = false;
                         flippedTiles = [];
                         lockBoard = false;
                         renderMatchingGame();
-                    }, 1500);
+                    }, 800); 
                 }
             }
         }
