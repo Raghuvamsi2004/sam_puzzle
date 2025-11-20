@@ -48,6 +48,11 @@
             image-rendering: -webkit-optimize-contrast; /* For webkit browsers */
             image-rendering: crisp-edges; /* Standard for sharper scaling */
         }
+        .back-btn {
+            cursor: pointer;
+            transition: color 0.2s;
+            display: inline-block; /* Crucial for margin/padding on small elements */
+        }
     </style>
 </head>
 <body class="bg-pink-50 p-4 flex items-center justify-center">
@@ -136,6 +141,7 @@
         let currentQuestionIndex = 0;
         let answers = {};
 
+        // --- NEW renderQuiz FUNCTION ---
         function renderQuiz() {
             const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
             if (!currentQuestion) {
@@ -143,8 +149,31 @@
                 return;
             }
 
+            // Determine which button(s) to show based on the current question index
+            let backButtonHTML = '';
+            
+            if (currentQuestionIndex > 0) {
+                // If past Q1, show "Previous Question"
+                backButtonHTML += `
+                    <p id="prev-question-btn" class="back-btn text-pink-500 hover:text-pink-700 text-sm font-medium mb-4 mr-4">
+                        <span class="text-base font-bold">←</span> Previous Question
+                    </p>
+                `;
+            }
+            
+            // Always allow going back to the start screen
+            backButtonHTML += `
+                <p id="back-to-start" class="back-btn text-pink-500 hover:text-pink-700 text-sm font-medium mb-4">
+                    <span class="text-base font-bold">←</span> Back to Start
+                </p>
+            `;
+
+
             appRoot.innerHTML = `
                 <div class="p-6 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
+                    <div class="flex justify-between items-center">
+                        ${backButtonHTML}
+                    </div>
                     <div class="text-sm text-pink-500 mb-4 font-semibold">
                         Question ${currentQuestionIndex + 1} of ${QUIZ_QUESTIONS.length}
                     </div>
@@ -165,7 +194,22 @@
                 btn.onclick = () => handleAnswer(option, currentQuestion.id);
                 optionsContainer.appendChild(btn);
             });
+            
+            // --- ATTACH LISTENERS ---
+            if (document.getElementById('back-to-start')) {
+                document.getElementById('back-to-start').onclick = () => {
+                    currentView = 'start';
+                    renderStartScreen();
+                };
+            }
+            if (document.getElementById('prev-question-btn')) {
+                document.getElementById('prev-question-btn').onclick = () => {
+                    currentQuestionIndex--;
+                    renderQuiz();
+                };
+            }
         }
+        // --- END renderQuiz FUNCTION ---
 
         function handleAnswer(selectedOption, questionId) {
             answers[questionId] = selectedOption;
