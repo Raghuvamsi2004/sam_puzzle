@@ -3,14 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Love Quest - A Surprise for My Girlfriend</title>
+    <title>Our Christmas Love Quest</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Inter', sans-serif; } /* Kept readable font for main text */
+        
+        /* Snowfall Animation Effect */
+        @keyframes snow {
+            0% { background-position: 0px 0px; }
+            100% { background-position: 100px 1000px; }
+        }
+        .christmas-bg {
+            background-color: #fef2f2;
+            background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23d1fae5" fill-opacity="0.8" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="1"/%3E%3Ccircle cx="13" cy="13" r="1"/%3E%3C/g%3E%3C/svg%3E');
+        }
+
         .app-container { max-width: 600px; min-height: 100vh; margin: 0 auto; }
         
-        /* Matching Game Styles */
+        /* Card & Flip Styles */
         .flip-container { perspective: 1000px; cursor: pointer; }
         .flipper { transition: 0.6s; transform-style: preserve-3d; position: relative; }
         .flip-container.flipped .flipper { transform: rotateY(180deg); }
@@ -19,20 +31,23 @@
         .back { transform: rotateY(180deg); }
         .back img { image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
         
-        /* Coupon Styles */
+        /* Christmas Coupon Styles */
         .coupon-card {
-            border: 2px dashed #ec4899;
-            background-color: #fff1f2;
+            border: 4px solid #dc2626; /* Red Border */
+            background-color: #fff;
+            background-image: radial-gradient(#f0fdf4 15%, transparent 16%), radial-gradient(#f0fdf4 15%, transparent 16%);
+            background-size: 20px 20px;
             position: relative;
             transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         .stamp {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-15deg);
-            color: #ef4444;
-            border: 4px solid #ef4444;
+            color: #15803d; /* Green Stamp */
+            border: 4px solid #15803d;
             font-size: 2rem;
             font-weight: 900;
             padding: 10px 20px;
@@ -41,7 +56,8 @@
             pointer-events: none;
             transition: opacity 0.3s ease, transform 0.3s ease;
             z-index: 10;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.9);
+            border-radius: 8px;
         }
         .is-redeemed .stamp {
             opacity: 1;
@@ -53,9 +69,17 @@
         }
 
         .back-btn { cursor: pointer; transition: color 0.2s; display: inline-block; }
+        
+        /* Festive Button */
+        .btn-festive {
+            transition: transform 0.2s;
+        }
+        .btn-festive:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
-<body class="bg-pink-50 p-4 flex items-center justify-center">
+<body class="christmas-bg p-4 flex items-center justify-center">
 
     <div id="app-root" class="app-container w-full">
         </div>
@@ -63,7 +87,7 @@
     <script>
         // --- DATA ---
 
-        // Level 1: Quiz
+        // Level 1: Quiz (UNCHANGED WORDS)
         const QUIZ_QUESTIONS = [
             { id: 1, question: "Where did we first kiss?", options: ["Area 51 cafe", "Rushikonda beach", "RK beach", "Teneti Park"], correctAnswer: "Rushikonda beach" }, 
             { id: 2, question: "What flower photos did I send you when we started texting?", options: ["Lotus", "Rose", "Lily", "Lavender"], correctAnswer: "Lily" }, 
@@ -72,7 +96,7 @@
             { id: 5, question: "Which company's exam was I writing when I stayed for a week in Kakinada?", options: ["Infosys", "Capgemini", "IBM", "Wipro"], correctAnswer: "Wipro" }, 
         ];
 
-        // Level 2: Memory Game
+        // Level 2: Memory Game (UNCHANGED WORDS)
         const MEMORY_PAIRS = [
             { id: 1, content: 'Rushikonda First Kiss', icon: "{{ url_for('static', filename='photo1.png') }}" },
             { id: 2, content: 'Lily Photos', icon: "{{ url_for('static', filename='photo2.png') }}" },
@@ -84,52 +108,52 @@
             { id: 8, content: 'Memory Eight', icon: "{{ url_for('static', filename='photo8.png') }}" },
         ];
 
-        // Coupon Questions Data
+        // Coupon Questions Data (UPDATED REWARDS)
         const COUPON_QUESTIONS = [
             { 
                 id: 1, 
                 question: "Who is the cutest person in the world?", 
-                options: ["Me (Sampreethi)", "You (Raghu)", "Both"], 
-                correct: "Me (Sampreethi)",
-                rewardTitle: "Head Massage Coupon",
-                rewardDesc: "Good for one 15-minute relaxing head massage."
+                options: ["Sampreethi", "Raghu", "Both"], 
+                correct: "Sampreethi",
+                rewardTitle: "The Human Taxi Service",
+                rewardDesc: "One free piggyback ride whenever you feel like it. No distance limit(be kind pls)."
             },
             { 
                 id: 2, 
-                question: "What is my favorite thing to do?", 
-                options: ["Eating", "Sleeping", "Annoying You"], 
-                correct: "Annoying You",
-                rewardTitle: "Late Night Maggie Pass",
-                rewardDesc: "I will cook late night maggie whenever you ask."
+                question: "What is raghu's favorite thing to do?", 
+                options: ["Eating", "Sleeping", "Annoying Sam"], 
+                correct: "Annoying Sam",
+                rewardTitle: "The 'SEX' Card",
+                rewardDesc: "One time validity. Your wish is my command cutu. 😉"
             },
             { 
                 id: 3, 
-                question: "If I am angry, what should you do?", 
-                options: ["Argue back", "Buy me food", "Ignore me"], 
-                correct: "Buy me food",
-                rewardTitle: "Forgiveness Voucher",
-                rewardDesc: "Redeem this to win any one argument instantly."
+                question: "If Sampreethi angry, what should raghu do?", 
+                options: ["Make fun of her", "Feed her food", "Ignore her"], 
+                correct: "Feed her food",
+                rewardTitle: "The Flower Finder",
+                rewardDesc: "I will find and bring you flowers. Anytime. Anywhere."
             },
             { 
                 id: 4, 
-                question: "Where do I belong?", 
-                options: ["In your arms", "In the kitchen", "In class"], 
-                correct: "In your arms",
-                rewardTitle: "Unlimited Cuddles",
-                rewardDesc: "Valid for unlimited cuddles for 24 hours."
+                question: "Where do Raghu belong?", 
+                options: ["In Sampreethi's arms", "In hell", "In class"], 
+                correct: "In Sampreethi's arms",
+                rewardTitle: "The Smooth Touch",
+                rewardDesc: "One uninterrupted full body massage to melt your stress away."
             },
             { 
                 id: 5, 
                 question: "Do you love me?", 
                 options: ["Yes", "Maybe", "No"], 
                 correct: "Yes",
-                rewardTitle: "Date Night Ticket",
-                rewardDesc: "I plan and pay for the next entire date."
+                rewardTitle: "what you see, I see",
+                rewardDesc: "We watch exactly what YOU want. Even if it's terrible, I won't complain."
             }
         ];
 
         const FINAL_GIFT = {
-            title: "Congratulations, my cutu!", 
+            title: "Merry Christmas, my cutu!", 
             message: "I'm now coming to your wonderful college event. And you can kiss me now.\nI love youuuuu 💩",
             photoUrl: "{{ url_for('static', filename='final_photo.jpg') }}", 
         };
@@ -137,11 +161,7 @@
         // --- STATE & UTILS ---
         const appRoot = document.getElementById('app-root');
         let currentView = 'start';
-        
-        // Coupon State: tracks if question is 'unanswered', 'won', 'redeemed'
         let couponState = COUPON_QUESTIONS.map(q => ({ status: 'unanswered' })); 
-
-        // Owe Tracker State (Init from LocalStorage)
         let oweData = JSON.parse(localStorage.getItem('oweData')) || {
             raghu: { count: 0, logs: [], showLogs: false },
             sampreethi: { count: 0, logs: [], showLogs: false }
@@ -155,34 +175,35 @@
             return array;
         };
 
-        const saveOweData = () => {
-            localStorage.setItem('oweData', JSON.stringify(oweData));
-        };
+        const saveOweData = () => { localStorage.setItem('oweData', JSON.stringify(oweData)); };
 
         // --- RENDER FUNCTIONS ---
 
         function renderStartScreen() {
             appRoot.innerHTML = `
-                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
-                    <div class="text-6xl mb-4 animate-bounce">💖</div>
-                    <h1 class="text-4xl font-extrabold text-gray-800 mb-2">Our Love Quest</h1>
-                    <p class="text-lg text-gray-600 mb-8">Choose your adventure, my love.</p>
+                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-8 border-red-600 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 text-4xl opacity-20">❄️</div>
+                    <div class="absolute top-0 left-0 p-2 text-4xl opacity-20">🎄</div>
                     
-                    <button id="start-btn" class="w-full py-3 px-6 bg-pink-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-pink-600 transition duration-300 mb-4">
-                        🎮 Start The Game (Quiz & Memories)
-                    </button>
-
-                    <div class="border-t border-gray-200 my-6 pt-6">
-                        <h3 class="text-gray-500 font-bold mb-4 uppercase text-xs tracking-wider">Bonus Features</h3>
-                        
-                        <button id="coupons-btn" class="w-full py-3 px-6 bg-purple-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-purple-600 transition duration-300 mb-4 flex items-center justify-center gap-2">
-                            🎟️ Win Love Coupons
+                    <div class="text-7xl mb-2 animate-bounce">🎅</div>
+                    <h1 class="text-4xl font-extrabold text-red-700 mb-2 tracking-tight">Christmas Love Quest</h1>
+                    <p class="text-lg text-green-700 font-medium mb-8">Ho Ho Ho! Choose your present, my love.</p>
+                    
+                    <div class="space-y-4">
+                        <button id="start-btn" class="btn-festive w-full py-4 px-6 bg-red-600 text-white font-bold text-lg rounded-xl shadow-lg border-b-4 border-red-800 hover:bg-red-700 flex items-center justify-center gap-3">
+                            🎮 Play The Memory Game
                         </button>
 
-                        <button id="owe-btn" class="w-full py-3 px-6 bg-teal-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-teal-600 transition duration-300 flex items-center justify-center gap-2">
-                            📝 You Owe Me Tracker
+                        <button id="coupons-btn" class="btn-festive w-full py-4 px-6 bg-green-600 text-white font-bold text-lg rounded-xl shadow-lg border-b-4 border-green-800 hover:bg-green-700 flex items-center justify-center gap-3">
+                            🎁 Unwrap Your Coupons
+                        </button>
+
+                        <button id="owe-btn" class="btn-festive w-full py-4 px-6 bg-yellow-500 text-red-900 font-bold text-lg rounded-xl shadow-lg border-b-4 border-yellow-600 hover:bg-yellow-400 flex items-center justify-center gap-3">
+                            📝 The "You Owe Me" List
                         </button>
                     </div>
+                    
+                    <p class="mt-8 text-xs text-gray-400">Made with ❤️ and ❄️ for Sampreethi</p>
                 </div>
             `;
             document.getElementById('start-btn').onclick = () => { renderQuiz(); };
@@ -190,7 +211,7 @@
             document.getElementById('owe-btn').onclick = () => { renderOweTracker(); };
         }
 
-        // --- QUIZ & GAME LOGIC (Minified for brevity, same as before) ---
+        // --- QUIZ & GAME LOGIC (Styles updated to Red/Green) ---
         let currentQuestionIndex = 0;
         let answers = {};
         
@@ -198,12 +219,12 @@
             const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
             if (!currentQuestion) { renderQuizResult(); return; }
             
-            let navHtml = `<p onclick="renderStartScreen()" class="back-btn text-pink-500 font-bold mb-4">← Home</p>`;
+            let navHtml = `<p onclick="renderStartScreen()" class="back-btn text-red-600 font-bold mb-4">← Home</p>`;
             
             appRoot.innerHTML = `
-                <div class="p-6 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
+                <div class="p-6 bg-white rounded-xl shadow-2xl border-t-4 border-green-600">
                     ${navHtml}
-                    <div class="text-sm text-pink-500 mb-2 font-semibold">Question ${currentQuestionIndex + 1}/${QUIZ_QUESTIONS.length}</div>
+                    <div class="text-sm text-green-600 mb-2 font-bold uppercase tracking-wide">Question ${currentQuestionIndex + 1}/${QUIZ_QUESTIONS.length}</div>
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">${currentQuestion.question}</h2>
                     <div id="options-container" class="space-y-3"></div>
                 </div>
@@ -212,7 +233,7 @@
             currentQuestion.options.forEach(option => {
                 const btn = document.createElement('button');
                 btn.textContent = option;
-                btn.className = "w-full text-left py-3 px-4 bg-pink-100 text-gray-700 rounded-lg hover:bg-pink-200 font-medium";
+                btn.className = "w-full text-left py-3 px-4 bg-red-50 text-gray-800 rounded-lg hover:bg-red-100 border border-red-100 font-medium transition";
                 btn.onclick = () => { answers[currentQuestion.id] = option; currentQuestionIndex++; renderQuiz(); };
                 container.appendChild(btn);
             });
@@ -222,15 +243,16 @@
             const score = QUIZ_QUESTIONS.filter(q => answers[q.id] === q.correctAnswer).length;
             const passed = score === QUIZ_QUESTIONS.length;
             appRoot.innerHTML = `
-                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 ${passed ? 'border-pink-500' : 'border-red-500'}">
-                    <h2 class="text-3xl font-bold mb-4">Quiz Complete!</h2>
-                    <p class="text-5xl font-extrabold mb-6 ${passed ? 'text-pink-600' : 'text-red-500'}">${score}/${QUIZ_QUESTIONS.length}</p>
-                    ${passed ? `<button onclick="initializeGame(); renderMatchingGame()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl shadow-lg">Unlock Memories (Level 2)</button>` 
+                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 ${passed ? 'border-green-500' : 'border-red-500'}">
+                    <div class="text-6xl mb-4">${passed ? '🌟' : '🍪'}</div>
+                    <h2 class="text-3xl font-bold mb-4 text-gray-800">Quiz Complete!</h2>
+                    <p class="text-5xl font-extrabold mb-6 ${passed ? 'text-green-600' : 'text-red-600'}">${score}/${QUIZ_QUESTIONS.length}</p>
+                    ${passed ? `<button onclick="initializeGame(); renderMatchingGame()" class="w-full py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700">Unlock Memories (Level 2)</button>` 
                              : `<button onclick="currentQuestionIndex=0; renderQuiz()" class="w-full py-3 bg-gray-400 text-white font-bold rounded-xl">Try Again</button>`}
                 </div>`;
         }
 
-        // --- MATCHING GAME ---
+        // --- MATCHING GAME (Styles updated) ---
         let gameTiles = [], flippedTiles = [], matchedPairs = 0, lockBoard = false;
         function initializeGame() {
             const doubled = MEMORY_PAIRS.flatMap(p => [{...p, uuid: p.id+'a'}, {...p, uuid: p.id+'b'}]);
@@ -240,7 +262,7 @@
 
         function renderMatchingGame() {
             appRoot.innerHTML = `
-                <div class="text-center p-4 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
+                <div class="text-center p-4 bg-white rounded-xl shadow-2xl border-t-4 border-red-600">
                     <p class="text-sm font-bold text-gray-500 mb-2">Matches: ${matchedPairs}/${MEMORY_PAIRS.length}</p>
                     <div class="grid grid-cols-4 gap-2" id="game-board"></div>
                 </div>`;
@@ -248,7 +270,7 @@
             gameTiles.forEach((tile, idx) => {
                 const el = document.createElement('div');
                 el.className = `flip-container aspect-square ${tile.isFlipped ? 'flipped' : ''} ${tile.isMatched ? 'invisible' : ''}`;
-                el.innerHTML = `<div class="flipper w-full h-full"><div class="front bg-pink-300 rounded-lg flex items-center justify-center text-2xl">🔒</div><div class="back bg-pink-500 rounded-lg overflow-hidden"><img src="${tile.icon}" class="w-full h-full object-cover"></div></div>`;
+                el.innerHTML = `<div class="flipper w-full h-full"><div class="front bg-red-100 rounded-lg flex items-center justify-center text-3xl border-2 border-red-200">🎁</div><div class="back bg-white border-2 border-red-500 rounded-lg overflow-hidden"><img src="${tile.icon}" class="w-full h-full object-cover"></div></div>`;
                 el.onclick = () => handleTileClick(idx);
                 board.appendChild(el);
             });
@@ -280,22 +302,22 @@
 
         function renderFinalScreen() {
             appRoot.innerHTML = `
-                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 border-yellow-500">
-                    <h1 class="text-3xl font-bold mb-4">${FINAL_GIFT.title}</h1>
-                    <img src="${FINAL_GIFT.photoUrl}" class="w-full rounded-lg mb-4">
-                    <p class="mb-6 whitespace-pre-wrap">${FINAL_GIFT.message}</p>
-                    <button onclick="renderStartScreen()" class="px-6 py-2 bg-gray-200 rounded-full font-bold">Back to Home</button>
+                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 border-yellow-400">
+                    <h1 class="text-3xl font-bold mb-4 text-red-600">${FINAL_GIFT.title}</h1>
+                    <img src="${FINAL_GIFT.photoUrl}" class="w-full rounded-lg mb-4 border-4 border-green-100">
+                    <p class="mb-6 whitespace-pre-wrap text-gray-700">${FINAL_GIFT.message}</p>
+                    <button onclick="renderStartScreen()" class="px-6 py-2 bg-gray-100 rounded-full font-bold text-gray-600 hover:bg-gray-200">Back to Home</button>
                 </div>`;
         }
 
-        // --- FEATURE: COUPONS ---
+        // --- FEATURE: COUPONS (Updated Text & Styles) ---
 
         function renderCoupons() {
             appRoot.innerHTML = `
-                <div class="p-4 bg-white rounded-xl shadow-2xl border-t-4 border-purple-500 min-h-screen">
+                <div class="p-4 bg-white rounded-xl shadow-2xl border-t-4 border-green-600 min-h-screen">
                     <div class="flex items-center mb-6">
-                        <button onclick="renderStartScreen()" class="text-purple-500 font-bold mr-4">← Back</button>
-                        <h2 class="text-2xl font-bold text-gray-800">Win Your Coupons</h2>
+                        <button onclick="renderStartScreen()" class="text-red-600 font-bold mr-4">← Back</button>
+                        <h2 class="text-2xl font-bold text-gray-800">🎄 Christmas Coupons</h2>
                     </div>
                     <div id="coupons-list" class="space-y-6">
                         </div>
@@ -310,17 +332,18 @@
                 if (state.status === 'unanswered') {
                     // Render Question
                     wrapper.innerHTML = `
-                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                            <h3 class="font-bold text-gray-800 mb-3">${idx+1}. ${q.question}</h3>
+                        <div class="bg-red-50 p-5 rounded-lg border border-red-100">
+                            <h3 class="font-bold text-red-800 mb-3">🎁 Gift #${idx+1}: Answer to Unlock</h3>
+                            <p class="text-sm text-gray-600 mb-3 italic">${q.question}</p>
                             <div class="space-y-2 mb-3">
                                 ${q.options.map(opt => `
-                                    <label class="flex items-center space-x-2 p-2 bg-white rounded cursor-pointer hover:bg-gray-50">
-                                        <input type="radio" name="q${idx}" value="${opt}" class="text-purple-600 focus:ring-purple-500">
-                                        <span class="text-sm text-gray-700">${opt}</span>
+                                    <label class="flex items-center space-x-2 p-3 bg-white rounded cursor-pointer hover:bg-red-100 border border-gray-100 transition">
+                                        <input type="radio" name="q${idx}" value="${opt}" class="text-red-600 focus:ring-red-500">
+                                        <span class="text-sm text-gray-800 font-medium">${opt}</span>
                                     </label>
                                 `).join('')}
                             </div>
-                            <button onclick="checkCouponAnswer(${idx})" class="w-full py-2 bg-purple-500 text-white rounded font-bold text-sm">Submit Answer</button>
+                            <button onclick="checkCouponAnswer(${idx})" class="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold text-sm shadow transition">Unlock Gift</button>
                         </div>
                     `;
                 } else {
@@ -328,12 +351,12 @@
                     const isRedeemed = state.status === 'redeemed';
                     wrapper.innerHTML = `
                         <div class="coupon-card p-6 rounded-lg text-center ${isRedeemed ? 'is-redeemed' : ''}">
-                            <div class="stamp">REDEEMED</div>
-                            <div class="text-4xl mb-2">🎟️</div>
-                            <h3 class="text-xl font-bold text-pink-600 mb-1">${q.rewardTitle}</h3>
-                            <p class="text-sm text-gray-600 mb-4">${q.rewardDesc}</p>
+                            <div class="stamp">Redeemed 🎅</div>
+                            <div class="text-4xl mb-2">🦌</div>
+                            <h3 class="text-xl font-black text-red-600 mb-1 uppercase tracking-tight">${q.rewardTitle}</h3>
+                            <p class="text-sm text-gray-600 mb-4 font-medium px-4">${q.rewardDesc}</p>
                             <button onclick="redeemCoupon(${idx})" ${isRedeemed ? 'disabled' : ''} 
-                                class="px-6 py-2 ${isRedeemed ? 'bg-gray-300' : 'bg-pink-500 hover:bg-pink-600'} text-white font-bold rounded-full shadow transition">
+                                class="px-6 py-2 ${isRedeemed ? 'bg-gray-300 text-gray-500' : 'bg-red-600 hover:bg-red-700 text-white'} font-bold rounded-full shadow-lg transition transform hover:scale-105">
                                 ${isRedeemed ? 'Used' : 'Redeem Now'}
                             </button>
                         </div>
@@ -345,34 +368,30 @@
 
         function checkCouponAnswer(idx) {
             const selected = document.querySelector(`input[name="q${idx}"]:checked`);
-            if (!selected) return alert("Please select an option!");
+            if (!selected) return alert("Santa says: Pick an answer first!");
             
             if (selected.value === COUPON_QUESTIONS[idx].correct) {
                 couponState[idx].status = 'won';
-                renderCoupons(); // Re-render to show coupon
-                // Add confetti effect logic here if desired
+                renderCoupons();
             } else {
-                alert("Wrong answer! Try again.");
+                alert("Oh no! That's not correct. Try again!");
             }
         }
 
         function redeemCoupon(idx) {
-            if(!confirm("Are you sure you want to redeem this?")) return;
+            if(!confirm("Are you sure you want to redeem this Christmas gift?")) return;
             couponState[idx].status = 'redeemed';
             renderCoupons();
         }
 
-        // --- FEATURE: OWE TRACKER ---
+        // --- FEATURE: OWE TRACKER (Festive Style) ---
 
         function updateOwe(person, change) {
             oweData[person].count += change;
             const logMsg = change > 0 ? `Added 1 owe` : `Removed 1 owe`;
             const dateStr = new Date().toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
-            
-            // Add to logs (keep only last 20)
             oweData[person].logs.unshift({ date: dateStr, msg: logMsg });
             if (oweData[person].logs.length > 20) oweData[person].logs.pop();
-            
             saveOweData();
             renderOweTracker();
         }
@@ -385,10 +404,10 @@
 
         function renderOweTracker() {
             appRoot.innerHTML = `
-                <div class="p-6 bg-white rounded-xl shadow-2xl border-t-4 border-teal-500 min-h-screen">
+                <div class="p-6 bg-white rounded-xl shadow-2xl border-t-4 border-yellow-500 min-h-screen">
                     <div class="flex items-center mb-6">
-                        <button onclick="renderStartScreen()" class="text-teal-600 font-bold mr-4">← Back</button>
-                        <h2 class="text-2xl font-bold text-gray-800">The "You Owe Me" Tracker</h2>
+                        <button onclick="renderStartScreen()" class="text-yellow-600 font-bold mr-4">← Back</button>
+                        <h2 class="text-2xl font-bold text-gray-800">📜 The Naughty & Nice List</h2>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -408,23 +427,24 @@
             `).join('');
 
             return `
-                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                    <h3 class="text-xl font-bold text-gray-700 text-center mb-2">${name}</h3>
+                <div class="bg-red-50 rounded-xl p-4 border border-red-100 relative">
+                    <div class="absolute -top-3 -right-3 text-2xl">🎅</div>
+                    <h3 class="text-xl font-bold text-red-800 text-center mb-2">${name}</h3>
                     <div class="text-center mb-4">
-                        <span class="text-5xl font-black ${data.count >= 0 ? 'text-teal-500' : 'text-red-500'}">
+                        <span class="text-5xl font-black ${data.count >= 0 ? 'text-green-600' : 'text-red-500'}">
                             ${data.count}
                         </span>
-                        <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Total owes</p>
+                        <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Total Owes</p>
                     </div>
                     
                     <div class="flex justify-center gap-4 mb-4">
-                        <button onclick="updateOwe('${key}', -1)" class="w-12 h-12 rounded-full bg-red-100 text-red-600 font-bold text-xl hover:bg-red-200">-</button>
-                        <button onclick="updateOwe('${key}', 1)" class="w-12 h-12 rounded-full bg-green-100 text-green-600 font-bold text-xl hover:bg-green-200">+</button>
+                        <button onclick="updateOwe('${key}', -1)" class="w-12 h-12 rounded-full bg-white border border-red-200 text-red-600 font-bold text-xl hover:bg-red-50 shadow-sm">-</button>
+                        <button onclick="updateOwe('${key}', 1)" class="w-12 h-12 rounded-full bg-white border border-green-200 text-green-600 font-bold text-xl hover:bg-green-50 shadow-sm">+</button>
                     </div>
 
                     <div class="text-center">
-                        <button onclick="toggleLogs('${key}')" class="text-xs text-teal-600 font-bold underline mb-2">
-                            ${data.showLogs ? 'Hide Logs' : 'Show Recent Logs'}
+                        <button onclick="toggleLogs('${key}')" class="text-xs text-yellow-600 font-bold underline mb-2">
+                            ${data.showLogs ? 'Hide History' : 'Show History'}
                         </button>
                         ${data.showLogs ? `<ul class="text-left bg-white p-2 rounded shadow-inner max-h-40 overflow-y-auto">${logHtml || '<li class="text-xs text-center text-gray-400">No logs yet</li>'}</ul>` : ''}
                     </div>
