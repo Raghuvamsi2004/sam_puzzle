@@ -4,69 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Love Quest - A Surprise for My Girlfriend</title>
-    <!-- Load Tailwind CSS for instant styling and responsiveness -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .app-container { max-width: 550px; min-height: 100vh; margin: 0 auto; }
+        .app-container { max-width: 600px; min-height: 100vh; margin: 0 auto; }
         
-        /* CSS for the smooth flip transition */
-        .flip-container {
-            perspective: 1000px;
-            cursor: pointer;
-        }
-        .flipper {
-            transition: 0.6s;
-            transform-style: preserve-3d;
+        /* Matching Game Styles */
+        .flip-container { perspective: 1000px; cursor: pointer; }
+        .flipper { transition: 0.6s; transform-style: preserve-3d; position: relative; }
+        .flip-container.flipped .flipper { transform: rotateY(180deg); }
+        .front, .back { backface-visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; }
+        .front { z-index: 2; transform: rotateY(0deg); }
+        .back { transform: rotateY(180deg); }
+        .back img { image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
+        
+        /* Coupon Styles */
+        .coupon-card {
+            border: 2px dashed #ec4899;
+            background-color: #fff1f2;
             position: relative;
+            transition: all 0.3s ease;
         }
-        .flip-container.flipped .flipper {
-            transform: rotateY(180deg);
-        }
-        .front, .back {
-            backface-visibility: hidden;
+        .stamp {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            color: #ef4444;
+            border: 4px solid #ef4444;
+            font-size: 2rem;
+            font-weight: 900;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 10;
+            background: rgba(255,255,255,0.8);
         }
-        .front {
-            z-index: 2;
-            transform: rotateY(0deg);
+        .is-redeemed .stamp {
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(-15deg) scale(1);
         }
-        .back {
-            transform: rotateY(180deg);
+        .is-redeemed {
+            filter: grayscale(0.5);
+            opacity: 0.8;
         }
-        /* *** FIX 2: IMPROVED IMAGE RENDERING *** */
-        .back img {
-            image-rendering: -webkit-optimize-contrast; /* For webkit browsers */
-            image-rendering: crisp-edges; /* Standard for sharper scaling */
-        }
-        .back-btn {
-            cursor: pointer;
-            transition: color 0.2s;
-            display: inline-block; /* Crucial for margin/padding on small elements */
-        }
+
+        .back-btn { cursor: pointer; transition: color 0.2s; display: inline-block; }
     </style>
 </head>
 <body class="bg-pink-50 p-4 flex items-center justify-center">
 
-    <!-- Main Content Area - This is where JavaScript will render the game -->
     <div id="app-root" class="app-container w-full">
-        <!-- Content injected by JavaScript -->
-    </div>
+        </div>
 
-    <!-- JavaScript Game Logic and Data -->
     <script>
-        // --- APPLICATION DATA (CUSTOMIZED) ---
+        // --- DATA ---
 
-        // Level 1: The Personalized Quiz Data
+        // Level 1: Quiz
         const QUIZ_QUESTIONS = [
             { id: 1, question: "Where did we first kiss?", options: ["Area 51 cafe", "Rushikonda beach", "RK beach", "Teneti Park"], correctAnswer: "Rushikonda beach" }, 
             { id: 2, question: "What flower photos did I send you when we started texting?", options: ["Lotus", "Rose", "Lily", "Lavender"], correctAnswer: "Lily" }, 
@@ -75,7 +72,7 @@
             { id: 5, question: "Which company's exam was I writing when I stayed for a week in Kakinada?", options: ["Infosys", "Capgemini", "IBM", "Wipro"], correctAnswer: "Wipro" }, 
         ];
 
-        // Level 2: The Matching Game Data (15 Pairs = 30 Tiles)
+        // Level 2: Memory Game
         const MEMORY_PAIRS = [
             { id: 1, content: 'Rushikonda First Kiss', icon: "{{ url_for('static', filename='photo1.png') }}" },
             { id: 2, content: 'Lily Photos', icon: "{{ url_for('static', filename='photo2.png') }}" },
@@ -85,27 +82,70 @@
             { id: 6, content: 'Memory Six', icon: "{{ url_for('static', filename='photo6.png') }}" },
             { id: 7, content: 'Memory Seven', icon: "{{ url_for('static', filename='photo7.png') }}" },
             { id: 8, content: 'Memory Eight', icon: "{{ url_for('static', filename='photo8.png') }}" },
-            { id: 9, content: 'Memory Nine', icon: "{{ url_for('static', filename='photo9.png') }}" },
-            { id: 10, content: 'Memory Ten', icon: "{{ url_for('static', filename='photo10.png') }}" },
-            { id: 11, content: 'Memory Eleven', icon: "{{ url_for('static', filename='photo11.png') }}" },
-            { id: 12, content: 'Memory Twelve', icon: "{{ url_for('static', filename='photo12.png') }}" },
-            { id: 13, content: 'Memory Thirteen', icon: "{{ url_for('static', filename='photo13.png') }}" },
-            { id: 14, content: 'Memory Fourteen', icon: "{{ url_for('static', filename='photo14.png') }}" },
-            { id: 15, content: 'Proposal Spot', icon: "{{ url_for('static', filename='photo15.png') }}" },
         ];
 
-        // Final Gift Content (CUSTOMIZED)
+        // Coupon Questions Data
+        const COUPON_QUESTIONS = [
+            { 
+                id: 1, 
+                question: "Who is the cutest person in the world?", 
+                options: ["Me (Sampreethi)", "You (Raghu)", "Both"], 
+                correct: "Me (Sampreethi)",
+                rewardTitle: "Head Massage Coupon",
+                rewardDesc: "Good for one 15-minute relaxing head massage."
+            },
+            { 
+                id: 2, 
+                question: "What is my favorite thing to do?", 
+                options: ["Eating", "Sleeping", "Annoying You"], 
+                correct: "Annoying You",
+                rewardTitle: "Late Night Maggie Pass",
+                rewardDesc: "I will cook late night maggie whenever you ask."
+            },
+            { 
+                id: 3, 
+                question: "If I am angry, what should you do?", 
+                options: ["Argue back", "Buy me food", "Ignore me"], 
+                correct: "Buy me food",
+                rewardTitle: "Forgiveness Voucher",
+                rewardDesc: "Redeem this to win any one argument instantly."
+            },
+            { 
+                id: 4, 
+                question: "Where do I belong?", 
+                options: ["In your arms", "In the kitchen", "In class"], 
+                correct: "In your arms",
+                rewardTitle: "Unlimited Cuddles",
+                rewardDesc: "Valid for unlimited cuddles for 24 hours."
+            },
+            { 
+                id: 5, 
+                question: "Do you love me?", 
+                options: ["Yes", "Maybe", "No"], 
+                correct: "Yes",
+                rewardTitle: "Date Night Ticket",
+                rewardDesc: "I plan and pay for the next entire date."
+            }
+        ];
+
         const FINAL_GIFT = {
-            title: "Congratulations, my cutu! You aced the quiz and unlocked all our cherished memories.", 
-            
-            message: "I'm now coming to your wonderful college event. And you can kiss me now. I love you more than all these moments combined.\n\nI love youuuuu 💩",
-            
+            title: "Congratulations, my cutu!", 
+            message: "I'm now coming to your wonderful college event. And you can kiss me now.\nI love youuuuu 💩",
             photoUrl: "{{ url_for('static', filename='final_photo.jpg') }}", 
         };
 
-        // --- GLOBAL STATE AND HELPER FUNCTIONS ---
-        let currentView = 'start';
+        // --- STATE & UTILS ---
         const appRoot = document.getElementById('app-root');
+        let currentView = 'start';
+        
+        // Coupon State: tracks if question is 'unanswered', 'won', 'redeemed'
+        let couponState = COUPON_QUESTIONS.map(q => ({ status: 'unanswered' })); 
+
+        // Owe Tracker State (Init from LocalStorage)
+        let oweData = JSON.parse(localStorage.getItem('oweData')) || {
+            raghu: { count: 0, logs: [], showLogs: false },
+            sampreethi: { count: 0, logs: [], showLogs: false }
+        };
 
         const shuffleArray = (array) => {
             for (let i = array.length - 1; i > 0; i--) {
@@ -115,253 +155,125 @@
             return array;
         };
 
-        // --- VIEW RENDERING FUNCTIONS (UNCHANGED) ---
+        const saveOweData = () => {
+            localStorage.setItem('oweData', JSON.stringify(oweData));
+        };
+
+        // --- RENDER FUNCTIONS ---
 
         function renderStartScreen() {
             appRoot.innerHTML = `
                 <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
                     <div class="text-6xl mb-4 animate-bounce">💖</div>
                     <h1 class="text-4xl font-extrabold text-gray-800 mb-2">Our Love Quest</h1>
-                    <h2 class="text-xl text-pink-600 mb-6">A Personalized Adventure for My Love</h2>
-                    <p class="text-lg text-gray-600 mb-8">
-                        To unlock your surprise, you must prove you know our story!
-                    </p>
-                    <button id="start-btn"
-                        class="w-full py-3 px-6 bg-pink-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-pink-600 transition duration-300 transform hover:scale-105">
-                        Start the Adventure
+                    <p class="text-lg text-gray-600 mb-8">Choose your adventure, my love.</p>
+                    
+                    <button id="start-btn" class="w-full py-3 px-6 bg-pink-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-pink-600 transition duration-300 mb-4">
+                        🎮 Start The Game (Quiz & Memories)
                     </button>
+
+                    <div class="border-t border-gray-200 my-6 pt-6">
+                        <h3 class="text-gray-500 font-bold mb-4 uppercase text-xs tracking-wider">Bonus Features</h3>
+                        
+                        <button id="coupons-btn" class="w-full py-3 px-6 bg-purple-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-purple-600 transition duration-300 mb-4 flex items-center justify-center gap-2">
+                            🎟️ Win Love Coupons
+                        </button>
+
+                        <button id="owe-btn" class="w-full py-3 px-6 bg-teal-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-teal-600 transition duration-300 flex items-center justify-center gap-2">
+                            📝 You Owe Me Tracker
+                        </button>
+                    </div>
                 </div>
             `;
-            document.getElementById('start-btn').onclick = () => {
-                currentView = 'quiz';
-                renderQuiz();
-            };
+            document.getElementById('start-btn').onclick = () => { renderQuiz(); };
+            document.getElementById('coupons-btn').onclick = () => { renderCoupons(); };
+            document.getElementById('owe-btn').onclick = () => { renderOweTracker(); };
         }
 
+        // --- QUIZ & GAME LOGIC (Minified for brevity, same as before) ---
         let currentQuestionIndex = 0;
         let answers = {};
-
-        // --- NEW renderQuiz FUNCTION ---
+        
         function renderQuiz() {
             const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
-            if (!currentQuestion) {
-                renderQuizResult();
-                return;
-            }
-
-            // Determine which button(s) to show based on the current question index
-            let backButtonHTML = '';
+            if (!currentQuestion) { renderQuizResult(); return; }
             
-            if (currentQuestionIndex > 0) {
-                // If past Q1, show "Previous Question"
-                backButtonHTML += `
-                    <p id="prev-question-btn" class="back-btn text-pink-500 hover:text-pink-700 text-sm font-medium mb-4 mr-4">
-                        <span class="text-base font-bold">←</span> Previous Question
-                    </p>
-                `;
-            }
+            let navHtml = `<p onclick="renderStartScreen()" class="back-btn text-pink-500 font-bold mb-4">← Home</p>`;
             
-            // Always allow going back to the start screen
-            backButtonHTML += `
-                <p id="back-to-start" class="back-btn text-pink-500 hover:text-pink-700 text-sm font-medium mb-4">
-                    <span class="text-base font-bold">←</span> Back to Start
-                </p>
-            `;
-
-
             appRoot.innerHTML = `
                 <div class="p-6 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
-                    <div class="flex justify-between items-center">
-                        ${backButtonHTML}
-                    </div>
-                    <div class="text-sm text-pink-500 mb-4 font-semibold">
-                        Question ${currentQuestionIndex + 1} of ${QUIZ_QUESTIONS.length}
-                    </div>
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-6">
-                        ${currentQuestion.question}
-                    </h2>
-                    <div id="options-container" class="space-y-4">
-                        <!-- Options injected here -->
-                    </div>
+                    ${navHtml}
+                    <div class="text-sm text-pink-500 mb-2 font-semibold">Question ${currentQuestionIndex + 1}/${QUIZ_QUESTIONS.length}</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">${currentQuestion.question}</h2>
+                    <div id="options-container" class="space-y-3"></div>
                 </div>
             `;
-            const optionsContainer = document.getElementById('options-container');
-
+            const container = document.getElementById('options-container');
             currentQuestion.options.forEach(option => {
                 const btn = document.createElement('button');
                 btn.textContent = option;
-                btn.className = "w-full text-left py-3 px-4 bg-pink-100 text-gray-700 rounded-lg border border-pink-300 hover:bg-pink-200 transition duration-150 font-medium";
-                btn.onclick = () => handleAnswer(option, currentQuestion.id);
-                optionsContainer.appendChild(btn);
+                btn.className = "w-full text-left py-3 px-4 bg-pink-100 text-gray-700 rounded-lg hover:bg-pink-200 font-medium";
+                btn.onclick = () => { answers[currentQuestion.id] = option; currentQuestionIndex++; renderQuiz(); };
+                container.appendChild(btn);
             });
-            
-            // --- ATTACH LISTENERS ---
-            if (document.getElementById('back-to-start')) {
-                document.getElementById('back-to-start').onclick = () => {
-                    currentView = 'start';
-                    renderStartScreen();
-                };
-            }
-            if (document.getElementById('prev-question-btn')) {
-                document.getElementById('prev-question-btn').onclick = () => {
-                    currentQuestionIndex--;
-                    renderQuiz();
-                };
-            }
-        }
-        // --- END renderQuiz FUNCTION ---
-
-        function handleAnswer(selectedOption, questionId) {
-            answers[questionId] = selectedOption;
-            currentQuestionIndex++;
-            renderQuiz();
         }
 
         function renderQuizResult() {
-            const requiredScore = QUIZ_QUESTIONS.length;
             const score = QUIZ_QUESTIONS.filter(q => answers[q.id] === q.correctAnswer).length;
-            const isSuccess = score >= requiredScore;
-
+            const passed = score === QUIZ_QUESTIONS.length;
             appRoot.innerHTML = `
-                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 ${isSuccess ? 'border-pink-500' : 'border-red-500'}">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
-                    <p class="text-5xl font-extrabold ${isSuccess ? 'text-pink-600' : 'text-red-500'} mb-6">
-                        Score: ${score}/${requiredScore}
-                    </p>
-
-                    ${isSuccess ? `
-                        <div class="text-6xl mb-4 text-yellow-500 animate-pulse">✨</div>
-                        <p class="text-xl font-medium text-gray-700 mb-6">
-                            You know me perfectly! Our memories are safe with you.
-                        </p>
-                        <button id="next-level-btn"
-                            class="w-full py-3 px-6 bg-pink-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-pink-600 transition duration-300 transform hover:scale-105">
-                            Continue to Level 2: Unlock Our Memories
-                        </button>
-                    ` : `
-                        <div class="text-6xl mb-4 text-red-500">❌</div>
-                        <p class="text-xl font-medium text-gray-700 mb-6">
-                            Aww, you missed a few! Let's make sure our history is crystal clear.
-                        </p>
-                        <button id="retry-btn"
-                            class="w-full py-3 px-6 bg-gray-400 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-gray-500 transition duration-300">
-                            Try Again
-                        </button>
-                    `}
-                </div>
-            `;
-
-            if (isSuccess) {
-                document.getElementById('next-level-btn').onclick = () => {
-                    currentView = 'game';
-                    initializeGame();
-                    renderMatchingGame();
-                };
-            } else {
-                document.getElementById('retry-btn').onclick = () => {
-                    currentQuestionIndex = 0;
-                    answers = {};
-                    renderQuiz();
-                };
-            }
+                <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 ${passed ? 'border-pink-500' : 'border-red-500'}">
+                    <h2 class="text-3xl font-bold mb-4">Quiz Complete!</h2>
+                    <p class="text-5xl font-extrabold mb-6 ${passed ? 'text-pink-600' : 'text-red-500'}">${score}/${QUIZ_QUESTIONS.length}</p>
+                    ${passed ? `<button onclick="initializeGame(); renderMatchingGame()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl shadow-lg">Unlock Memories (Level 2)</button>` 
+                             : `<button onclick="currentQuestionIndex=0; renderQuiz()" class="w-full py-3 bg-gray-400 text-white font-bold rounded-xl">Try Again</button>`}
+                </div>`;
         }
 
-        // --- MATCHING GAME LOGIC ---
-
-        let gameTiles = [];
-        let flippedTiles = [];
-        let matchedPairs = 0;
-        let lockBoard = false;
-        const totalPairs = MEMORY_PAIRS.length;
-
+        // --- MATCHING GAME ---
+        let gameTiles = [], flippedTiles = [], matchedPairs = 0, lockBoard = false;
         function initializeGame() {
-            const doubledTiles = MEMORY_PAIRS.flatMap(p => [
-                { id: p.id, icon: p.icon, content: p.content, isFlipped: false, isMatched: false, key: `${p.id}-a` },
-                { id: p.id, icon: p.icon, content: p.content, isFlipped: false, isMatched: false, key: `${p.id}-b` },
-            ]);
-            gameTiles = shuffleArray(doubledTiles);
-            flippedTiles = [];
-            matchedPairs = 0;
-            lockBoard = false;
+            const doubled = MEMORY_PAIRS.flatMap(p => [{...p, uuid: p.id+'a'}, {...p, uuid: p.id+'b'}]);
+            gameTiles = shuffleArray(doubled).map(t => ({...t, isFlipped: false, isMatched: false}));
+            flippedTiles = []; matchedPairs = 0; lockBoard = false;
         }
 
         function renderMatchingGame() {
             appRoot.innerHTML = `
                 <div class="text-center p-4 bg-white rounded-xl shadow-2xl border-t-4 border-pink-500">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Level 2: Find Our ${totalPairs} Memories!</h2>
-                    <p class="text-sm text-gray-500 mb-4">
-                        Matched Pairs: <span id="matched-count">${matchedPairs}</span> / ${totalPairs}
-                    </p>
-                    <div id="game-board" class="grid grid-cols-5 gap-2 md:grid-cols-6 md:gap-3 p-2 bg-pink-50 rounded-lg">
-                        <!-- Tiles injected here -->
-                    </div>
-                </div>
-            `;
-
-            const gameBoard = document.getElementById('game-board');
-            gameBoard.style.gridTemplateColumns = 'repeat(5, minmax(0, 1fr))'; 
-            
-            gameTiles.forEach((tile, index) => {
-                const tileDiv = document.createElement('div');
-                tileDiv.className = `flip-container aspect-square transition duration-300 ${tile.isFlipped ? 'flipped' : ''} ${tile.isMatched ? 'invisible' : ''}`;
-                tileDiv.setAttribute('data-index', index);
-                
-                tileDiv.innerHTML = `
-                    <div class="flipper w-full h-full">
-                        <div class="front bg-pink-300 text-pink-800 shadow-md">
-                            <span class="text-4xl">🔒</span>
-                        </div>
-                        <div class="back bg-pink-500 text-white shadow-xl text-3xl p-1">
-                            <img src="${tile.icon}" alt="${tile.content}" class="object-cover w-full h-full rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/40x40/F0F9FF/06B6D4?text=X';" />
-                        </div>
-                    </div>
-                `;
-                tileDiv.onclick = () => handleTileClick(index);
-                gameBoard.appendChild(tileDiv);
+                    <p class="text-sm font-bold text-gray-500 mb-2">Matches: ${matchedPairs}/${MEMORY_PAIRS.length}</p>
+                    <div class="grid grid-cols-4 gap-2" id="game-board"></div>
+                </div>`;
+            const board = document.getElementById('game-board');
+            gameTiles.forEach((tile, idx) => {
+                const el = document.createElement('div');
+                el.className = `flip-container aspect-square ${tile.isFlipped ? 'flipped' : ''} ${tile.isMatched ? 'invisible' : ''}`;
+                el.innerHTML = `<div class="flipper w-full h-full"><div class="front bg-pink-300 rounded-lg flex items-center justify-center text-2xl">🔒</div><div class="back bg-pink-500 rounded-lg overflow-hidden"><img src="${tile.icon}" class="w-full h-full object-cover"></div></div>`;
+                el.onclick = () => handleTileClick(idx);
+                board.appendChild(el);
             });
         }
 
         function handleTileClick(index) {
             if (lockBoard || gameTiles[index].isFlipped || gameTiles[index].isMatched) return;
-
             gameTiles[index].isFlipped = true;
             flippedTiles.push(index);
-
             renderMatchingGame();
-
+            
             if (flippedTiles.length === 2) {
                 lockBoard = true;
-                const [index1, index2] = flippedTiles;
-                const tile1 = gameTiles[index1];
-                const tile2 = gameTiles[index2];
-
-                if (tile1.id === tile2.id) {
-                    // Match found! (600ms success delay)
+                const [i1, i2] = flippedTiles;
+                if (gameTiles[i1].id === gameTiles[i2].id) {
                     setTimeout(() => {
-                        gameTiles[index1].isMatched = true;
-                        gameTiles[index2].isMatched = true;
-                        matchedPairs++;
-                        
-                        flippedTiles = [];
-                        lockBoard = false;
-                        renderMatchingGame(); 
-
-                        if (matchedPairs === totalPairs) {
-                            setTimeout(() => {
-                                currentView = 'final';
-                                renderFinalScreen();
-                            }, 1000); 
-                        }
-                    }, 600); 
+                        gameTiles[i1].isMatched = true; gameTiles[i2].isMatched = true;
+                        matchedPairs++; flippedTiles = []; lockBoard = false; renderMatchingGame();
+                        if (matchedPairs === MEMORY_PAIRS.length) renderFinalScreen();
+                    }, 600);
                 } else {
-                    // No match - flip back. (800ms mismatch delay)
                     setTimeout(() => {
-                        gameTiles[index1].isFlipped = false;
-                        gameTiles[index2].isFlipped = false;
-                        flippedTiles = [];
-                        lockBoard = false;
-                        renderMatchingGame();
-                    }, 800); 
+                        gameTiles[i1].isFlipped = false; gameTiles[i2].isFlipped = false;
+                        flippedTiles = []; lockBoard = false; renderMatchingGame();
+                    }, 800);
                 }
             }
         }
@@ -369,28 +281,159 @@
         function renderFinalScreen() {
             appRoot.innerHTML = `
                 <div class="text-center p-8 bg-white rounded-xl shadow-2xl border-t-4 border-yellow-500">
-                    <div class="text-6xl mb-4 text-yellow-500 animate-bounce">🎁</div>
-                    <h1 class="text-4xl font-extrabold text-gray-800 mb-4">${FINAL_GIFT.title}</h1>
-                    <img 
-                        src="${FINAL_GIFT.photoUrl}" 
-                        alt="Final Gift Surprise" 
-                        class="w-full h-auto max-h-96 rounded-lg shadow-xl mb-6 mx-auto object-cover" 
-                        onerror="this.onerror=null;this.src='https://placehold.co/400x300/F0F9FF/06B6D4?text=IMAGE+ERROR';"
-                    />
-                    <p class="text-lg text-gray-700 whitespace-pre-wrap leading-relaxed mb-6">
-                        ${FINAL_GIFT.message}
-                    </p>
-                    <div class="flex justify-center space-x-4 mt-6">
-                        <div class="text-3xl text-yellow-500">✨</div>
-                        <p class="text-lg text-black-600">Chala ante Chala</p>
-                        <div class="text-3xl text-red-500">❤️</div>
+                    <h1 class="text-3xl font-bold mb-4">${FINAL_GIFT.title}</h1>
+                    <img src="${FINAL_GIFT.photoUrl}" class="w-full rounded-lg mb-4">
+                    <p class="mb-6 whitespace-pre-wrap">${FINAL_GIFT.message}</p>
+                    <button onclick="renderStartScreen()" class="px-6 py-2 bg-gray-200 rounded-full font-bold">Back to Home</button>
+                </div>`;
+        }
+
+        // --- FEATURE: COUPONS ---
+
+        function renderCoupons() {
+            appRoot.innerHTML = `
+                <div class="p-4 bg-white rounded-xl shadow-2xl border-t-4 border-purple-500 min-h-screen">
+                    <div class="flex items-center mb-6">
+                        <button onclick="renderStartScreen()" class="text-purple-500 font-bold mr-4">← Back</button>
+                        <h2 class="text-2xl font-bold text-gray-800">Win Your Coupons</h2>
+                    </div>
+                    <div id="coupons-list" class="space-y-6">
+                        </div>
+                </div>
+            `;
+            const list = document.getElementById('coupons-list');
+            
+            COUPON_QUESTIONS.forEach((q, idx) => {
+                const state = couponState[idx];
+                const wrapper = document.createElement('div');
+                
+                if (state.status === 'unanswered') {
+                    // Render Question
+                    wrapper.innerHTML = `
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                            <h3 class="font-bold text-gray-800 mb-3">${idx+1}. ${q.question}</h3>
+                            <div class="space-y-2 mb-3">
+                                ${q.options.map(opt => `
+                                    <label class="flex items-center space-x-2 p-2 bg-white rounded cursor-pointer hover:bg-gray-50">
+                                        <input type="radio" name="q${idx}" value="${opt}" class="text-purple-600 focus:ring-purple-500">
+                                        <span class="text-sm text-gray-700">${opt}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                            <button onclick="checkCouponAnswer(${idx})" class="w-full py-2 bg-purple-500 text-white rounded font-bold text-sm">Submit Answer</button>
+                        </div>
+                    `;
+                } else {
+                    // Render Coupon (Won or Redeemed)
+                    const isRedeemed = state.status === 'redeemed';
+                    wrapper.innerHTML = `
+                        <div class="coupon-card p-6 rounded-lg text-center ${isRedeemed ? 'is-redeemed' : ''}">
+                            <div class="stamp">REDEEMED</div>
+                            <div class="text-4xl mb-2">🎟️</div>
+                            <h3 class="text-xl font-bold text-pink-600 mb-1">${q.rewardTitle}</h3>
+                            <p class="text-sm text-gray-600 mb-4">${q.rewardDesc}</p>
+                            <button onclick="redeemCoupon(${idx})" ${isRedeemed ? 'disabled' : ''} 
+                                class="px-6 py-2 ${isRedeemed ? 'bg-gray-300' : 'bg-pink-500 hover:bg-pink-600'} text-white font-bold rounded-full shadow transition">
+                                ${isRedeemed ? 'Used' : 'Redeem Now'}
+                            </button>
+                        </div>
+                    `;
+                }
+                list.appendChild(wrapper);
+            });
+        }
+
+        function checkCouponAnswer(idx) {
+            const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+            if (!selected) return alert("Please select an option!");
+            
+            if (selected.value === COUPON_QUESTIONS[idx].correct) {
+                couponState[idx].status = 'won';
+                renderCoupons(); // Re-render to show coupon
+                // Add confetti effect logic here if desired
+            } else {
+                alert("Wrong answer! Try again.");
+            }
+        }
+
+        function redeemCoupon(idx) {
+            if(!confirm("Are you sure you want to redeem this?")) return;
+            couponState[idx].status = 'redeemed';
+            renderCoupons();
+        }
+
+        // --- FEATURE: OWE TRACKER ---
+
+        function updateOwe(person, change) {
+            oweData[person].count += change;
+            const logMsg = change > 0 ? `Added 1 owe` : `Removed 1 owe`;
+            const dateStr = new Date().toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
+            
+            // Add to logs (keep only last 20)
+            oweData[person].logs.unshift({ date: dateStr, msg: logMsg });
+            if (oweData[person].logs.length > 20) oweData[person].logs.pop();
+            
+            saveOweData();
+            renderOweTracker();
+        }
+
+        function toggleLogs(person) {
+            oweData[person].showLogs = !oweData[person].showLogs;
+            saveOweData();
+            renderOweTracker();
+        }
+
+        function renderOweTracker() {
+            appRoot.innerHTML = `
+                <div class="p-6 bg-white rounded-xl shadow-2xl border-t-4 border-teal-500 min-h-screen">
+                    <div class="flex items-center mb-6">
+                        <button onclick="renderStartScreen()" class="text-teal-600 font-bold mr-4">← Back</button>
+                        <h2 class="text-2xl font-bold text-gray-800">The "You Owe Me" Tracker</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        ${renderPersonCard('raghu', 'Raghu')}
+                        ${renderPersonCard('sampreethi', 'Sampreethi')}
                     </div>
                 </div>
             `;
         }
-        
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', renderStartScreen);
+
+        function renderPersonCard(key, name) {
+            const data = oweData[key];
+            const logHtml = data.logs.slice(0, 10).map(l => `
+                <li class="text-xs text-gray-500 flex justify-between border-b border-gray-100 py-1">
+                    <span>${l.msg}</span> <span class="text-gray-400">${l.date}</span>
+                </li>
+            `).join('');
+
+            return `
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-700 text-center mb-2">${name}</h3>
+                    <div class="text-center mb-4">
+                        <span class="text-5xl font-black ${data.count >= 0 ? 'text-teal-500' : 'text-red-500'}">
+                            ${data.count}
+                        </span>
+                        <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Total owes</p>
+                    </div>
+                    
+                    <div class="flex justify-center gap-4 mb-4">
+                        <button onclick="updateOwe('${key}', -1)" class="w-12 h-12 rounded-full bg-red-100 text-red-600 font-bold text-xl hover:bg-red-200">-</button>
+                        <button onclick="updateOwe('${key}', 1)" class="w-12 h-12 rounded-full bg-green-100 text-green-600 font-bold text-xl hover:bg-green-200">+</button>
+                    </div>
+
+                    <div class="text-center">
+                        <button onclick="toggleLogs('${key}')" class="text-xs text-teal-600 font-bold underline mb-2">
+                            ${data.showLogs ? 'Hide Logs' : 'Show Recent Logs'}
+                        </button>
+                        ${data.showLogs ? `<ul class="text-left bg-white p-2 rounded shadow-inner max-h-40 overflow-y-auto">${logHtml || '<li class="text-xs text-center text-gray-400">No logs yet</li>'}</ul>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Start App
+        renderStartScreen();
     </script>
 </body>
 </html>
